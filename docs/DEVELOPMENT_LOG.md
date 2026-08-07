@@ -508,3 +508,79 @@ Phase 6 — Task 1 Backend foundation is complete and approved.
 Begin Phase 6 — Task 2: Implement the minimum database and shared persistence foundation.
 
 ---
+
+---
+
+## 2026-08-07 — Accelerated Phase 6 Sequential Execution Workflow Adopted
+
+### Stage
+
+Phase 6 — Implement the Backend.
+
+### Context
+
+Phase 6 — Task 1: Adapt the Existing Laravel Foundation was completed, reviewed, committed, and pushed before this workflow update.
+
+The first Backend foundation task confirmed the approved Laravel foundation, Sanctum integration, role-specific route loading, centralized API responses, safe API exception handling, foundation tests, and required dependency-security corrections.
+
+### Workflow Update
+
+To reduce delivery time for the first working Backend version, the remaining approved Phase 6 tasks may now be executed through one Codex master execution task.
+
+The master execution task must preserve the previously approved task order and treat every remaining task as an independent bounded subtask.
+
+Each subtask must:
+
+* Stay within its approved functional and technical scope.
+* Respect all documented exclusions and deferred functionality.
+* Implement its required tests.
+* Pass its required verification gate before the next subtask begins.
+* Append its completion record to `DEVELOPMENT_LOG.md` after successful verification.
+
+Codex may automatically resolve routine implementation issues, test failures, formatting issues, and compatible security dependency corrections when the correction remains completely within the approved scope.
+
+Codex must stop before proceeding when implementation would require:
+
+* A functional requirement not supported by the SRS-derived baseline.
+* An answer to an unresolved Open Question.
+* A new field, permission, workflow, status, Business Rule, provider, or policy.
+* An unapproved database relationship or API behavior.
+* A change to an approved Phase 5 technical or architecture decision.
+* Implementation of deferred functionality.
+* A genuinely new technical decision requiring approval.
+
+### Approved Remaining Phase 6 Order
+
+1. Task 2 — Minimum Database and Shared Persistence Foundation.
+2. Task 3 — Shared Authentication and Role Authorization.
+3. Task 4 — Doctor and Secretary Account Administration.
+4. Task 5 — Complete Patient Read-Only Directory.
+5. Task 6 — Final Verification, Hardening, and Postman Collection.
+
+### Functional and Technical Boundaries
+
+* The SRS remains the sole authoritative functional source before delivery of the first working Backend version.
+* `BACKEND_ANALYSIS.md` remains the authoritative SRS-derived Backend baseline.
+* `PROJECT_UNDERSTANDING_QA.md` remains the canonical registry for unresolved functional questions.
+* The approved Phase 5 technical documentation remains authoritative.
+* No functional requirement, technical decision, database relationship, endpoint, permission, workflow, status, Business Rule, provider, or policy was added or changed by this workflow update.
+* Deferred requirements remain deferred.
+* This update changes only how the already-approved implementation tasks are executed.
+
+### Git Boundary
+
+Codex must not create commits, push changes, merge branches, create branches, or create Pull Requests during the master execution task unless explicitly authorized separately.
+
+### Current Status
+
+Phase 6 remains in progress.
+
+Task 1 is complete.
+
+The accelerated sequential workflow is approved for Tasks 2 through 6.
+
+### Next Step
+
+Begin the Phase 6 master execution task with Task 2 — Minimum Database and Shared Persistence Foundation.
+
+---

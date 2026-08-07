@@ -623,15 +623,28 @@ Technical decisions must not introduce new functional requirements.
 
 ### Working Cycle
 
-1. Analyze and approve the task in Chat.
-2. Confirm that the related functional requirement is supported by the SRS.
-3. Update the appropriate documentation through Work when needed.
-4. Review and approve the documentation result.
-5. Prepare one bounded implementation task for Codex.
-6. Codex implements the code and tests.
-7. Codex reports modified files, commands, and test results.
-8. Review the result in Chat.
-9. Update DEVELOPMENT_LOG.md and other affected documentation.
+Phase 6 uses an accelerated sequential implementation workflow to minimize delivery time while preserving the approved scope, technical baseline, verification requirements, and SRS-only policy.
+
+1. Chat defines and approves the ordered Phase 6 implementation queue before execution.
+2. Multiple already-approved bounded implementation tasks may be delivered to Codex through one master execution task.
+3. Each task inside the master execution task remains an independent bounded subtask with its own implementation scope, exclusions, tests, verification gate, and documentation closeout.
+4. Codex must execute the subtasks strictly in the approved dependency order.
+5. Codex may continue automatically from one subtask to the next only after the current subtask's required tests and quality checks pass.
+6. Routine implementation corrections, test corrections, formatting fixes, and compatible security dependency corrections may be completed automatically when they remain fully inside the approved technical and functional scope.
+7. After each successfully completed subtask, Codex must append the required completion record to `DEVELOPMENT_LOG.md` before continuing.
+8. Other documentation files may be modified only when the master task explicitly authorizes the exact file and change.
+9. Codex must stop before continuing if implementation requires:
+   * A functional requirement not explicitly supported by the SRS-derived baseline.
+   * An answer to an unresolved item in `PROJECT_UNDERSTANDING_QA.md`.
+   * A new field, permission, workflow, status, Business Rule, provider, or policy.
+   * A new database relationship or API behavior not already approved.
+   * A change to an approved Phase 5 technical or architecture decision.
+   * Implementation of a deferred requirement.
+   * Any genuinely new technical decision that cannot be resolved from the approved documentation.
+10. A stopped master execution task must report the blocking decision without inventing a workaround or assumption.
+11. Codex must not create commits, push changes, merge branches, create branches, or create Pull Requests unless explicitly authorized in a separate instruction.
+12. Chat reviews the resulting implementation, verification evidence, documentation changes, and Git diff before the changes are committed.
+13. The SRS remains the sole authoritative source for functional requirements until delivery of the first working Backend version.
 
 ## Phase 7 — Post-First-Version Team Clarification
 
@@ -650,61 +663,22 @@ Review all unresolved SRS questions with the project team after delivery of the 
 
 ## Current Next Step
 
-Phase 5 — Define Technical and Architecture Decisions is complete and approved.
+Phase 6 — Task 1: Adapt the Existing Laravel Foundation is complete, approved, committed, and pushed to `backend-development`.
 
-The completed Phase 5 documentation is:
+Continue Phase 6 using the accelerated sequential implementation workflow.
 
-* `BACKEND_DESIGN_DECISIONS.md`
-* `LARAVEL_ARCHITECTURE.md`
-* `DATABASE_DESIGN.md`
-* `API_SPECIFICATION.md`
-* `TESTING.md`
-* `DEPLOYMENT.md`
-* `GIT_GITHUB_GUIDE.md`
+The remaining approved implementation order is:
 
-The adopted technical baseline now defines:
+1. Task 2 — Minimum Database and Shared Persistence Foundation.
+2. Task 3 — Shared Authentication and Role Authorization.
+3. Task 4 — Doctor and Secretary Account Administration.
+4. Task 5 — Complete Patient Read-Only Directory.
+5. Task 6 — Final Verification, Hardening, and Postman Collection.
 
-* Laravel `13.x`.
-* PHP `8.4.x`.
-* MySQL `8.4 LTS`.
-* Composer `2.x`.
-* The modular-monolith architecture.
-* Role-first and feature-first organization.
-* Services as the unified task layer.
-* Repository Interfaces and Eloquent implementations.
-* Shared Models and infrastructure.
-* Role-specific route files.
-* Laravel Sanctum Bearer Token authentication.
-* Role-based authorization.
-* The minimum immediate database schema.
-* REST and JSON conventions.
-* Pagination.
-* Validation and error conventions.
-* Audit persistence.
-* Initial Super Administrator provisioning.
-* Testing tools and organization.
-* Local-development setup.
-* Production-deployment boundaries.
-* Git and GitHub repository policy.
+Tasks 2 through 6 may be executed through one Codex master execution task, but each task remains an independent bounded subtask and must pass its required verification gate before the next task begins.
 
-Begin Phase 6 — Implement the Backend.
+After each successful subtask, append its completion record to `DEVELOPMENT_LOG.md`.
 
-Phase 6 must continue using the established working cycle:
-
-1. Analyze one bounded implementation task in Chat.
-2. Confirm that its functional behavior is supported by the SRS-derived baseline.
-3. Confirm that its technical decisions are documented.
-4. Send one bounded implementation task to Codex.
-5. Require Codex to implement code and tests.
-6. Require Codex to report modified files, commands, and test results.
-7. Review the implementation result in Chat.
-8. Correct the implementation when needed.
-9. Update affected documentation and `DEVELOPMENT_LOG.md`.
-
-The first Phase 6 task must be limited to Backend foundation and project initialization.
-
-It may prepare only the documented technical foundation required by later immediate-scope tasks.
-
-It must not implement deferred functional modules.
+If any subtask requires a new functional requirement, an answer to an Open Question, a new technical decision, a scope expansion, or implementation of deferred functionality, stop before proceeding and return the blocker for review.
 
 No unresolved functional question may be answered through implementation assumption.
