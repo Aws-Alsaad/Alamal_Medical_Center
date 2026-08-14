@@ -214,7 +214,7 @@ Prepare the Backend foundation required by all later functionality.
 The implementation must support the confirmed constraints and cross-cutting requirements for:
 
 * Laravel and PHP.
-* MySQL.
+* MariaDB.
 * RESTful client communication.
 * JSON request and response data.
 * Secure HTTP/HTTPS communication boundaries.
@@ -228,7 +228,7 @@ The implementation must support the confirmed constraints and cross-cutting requ
 * Modular and independently testable components.
 * Unit, integration, and system testing.
 
-Laravel version, PHP version, MySQL version, authentication mechanism, API conventions, error-response format, architecture structure, and testing tools remain Phase 5 technical decisions.
+Laravel version, PHP version, MariaDB version, authentication mechanism, API conventions, error-response format, architecture structure, and testing tools remain Phase 5 technical decisions.
 
 #### Wave 2 — Authentication and Role Authorization Core
 
@@ -663,22 +663,10 @@ Review all unresolved SRS questions with the project team after delivery of the 
 
 ## Current Next Step
 
-Phase 6 — Task 1: Adapt the Existing Laravel Foundation is complete, approved, committed, and pushed to `backend-development`.
+Phase 6 Tasks 2 through 6 and the approved consolidated coding-style, architecture-alignment, cleanup, Postman, testing, and documentation refactor are complete.
 
-Continue Phase 6 using the accelerated sequential implementation workflow.
+The implemented first-version Backend retains exactly `23` approved API routes, uses complete collection responses for the current Patient directory lists, and runs automated database tests against the dedicated MariaDB database `alamal_medical_center_testing`.
 
-The remaining approved implementation order is:
+The next step is final team review of the implementation, verification evidence, documentation, Postman collection, and Git diff before any separately authorized commit or push.
 
-1. Task 2 — Minimum Database and Shared Persistence Foundation.
-2. Task 3 — Shared Authentication and Role Authorization.
-3. Task 4 — Doctor and Secretary Account Administration.
-4. Task 5 — Complete Patient Read-Only Directory.
-5. Task 6 — Final Verification, Hardening, and Postman Collection.
-
-Tasks 2 through 6 may be executed through one Codex master execution task, but each task remains an independent bounded subtask and must pass its required verification gate before the next task begins.
-
-After each successful subtask, append its completion record to `DEVELOPMENT_LOG.md`.
-
-If any subtask requires a new functional requirement, an answer to an Open Question, a new technical decision, a scope expansion, or implementation of deferred functionality, stop before proceeding and return the blocker for review.
-
-No unresolved functional question may be answered through implementation assumption.
+No unresolved functional question was answered through implementation assumption, and deferred functionality remains unimplemented.

@@ -194,7 +194,7 @@ Examples:
 ```text
 feat: add role-based authentication
 feat: add doctor directory endpoint
-feat: add department pagination
+feat: add department directory endpoint
 ```
 
 ### fix:
@@ -217,7 +217,7 @@ Examples:
 
 ```text
 test: add login feature tests
-test: cover department pagination
+test: cover department directory response
 test: add invalid-role authentication tests
 ```
 

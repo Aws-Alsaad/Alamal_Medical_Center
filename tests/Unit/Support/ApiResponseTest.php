@@ -7,8 +7,7 @@ use Tests\TestCase;
 
 class ApiResponseTest extends TestCase
 {
-    public function test_it_produces_the_approved_success_envelope(): void
-    {
+    public function test_it_produces_the_approved_success_envelope(): void {
         $response = ApiResponse::success();
 
         $this->assertSame(200, $response->getStatusCode());
@@ -20,8 +19,7 @@ class ApiResponseTest extends TestCase
         ], $response->getData(true));
     }
 
-    public function test_it_produces_the_approved_error_envelope(): void
-    {
+    public function test_it_produces_the_approved_error_envelope(): void {
         $errors = [
             'email' => ['The email field is required.'],
         ];
@@ -43,8 +41,7 @@ class ApiResponseTest extends TestCase
         ], $response->getData(true));
     }
 
-    public function test_it_omits_errors_when_no_field_level_details_are_relevant(): void
-    {
+    public function test_it_omits_errors_when_no_field_level_details_are_relevant(): void {
         $response = ApiResponse::error(
             message: 'Authentication is required.',
             errorCode: 'UNAUTHENTICATED',

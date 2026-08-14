@@ -1,0 +1,1077 @@
+{
+    "info": {
+        "_postman_id": "a81eebc9-3cbb-45a5-9dc9-97adcf9f91ed",
+        "name": "Alamal Medical Center - First-Version API",
+        "description": "Manual verification for the approved Phase 6 first-version backend. Start the local API with php artisan serve and use the default base_url http://127.0.0.1:8000, or override the collection variable for another local port. A Postman request that remains at Sending request usually means the local Laravel server is not running, base_url points to the wrong port, or the request is using an unavailable host. Successful login requests store fictional-session tokens in role-specific collection variables.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Patient",
+            "item": [
+                {
+                    "name": "Authentication",
+                    "item": [
+                        {
+                            "name": "Login",
+                            "item": [
+                                {
+                                    "name": "Patient Login",
+                                    "event": [
+                                        {
+                                            "listen": "test",
+                                            "script": {
+                                                "type": "text/javascript",
+                                                "exec": [
+                                                    "const payload = pm.response.json();",
+                                                    "if (payload.success && payload.data && payload.data.token) {",
+                                                    "    pm.collectionVariables.set('patient_token', payload.data.token);",
+                                                    "}"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "request": {
+                                        "method": "POST",
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "key": "Content-Type",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "body": {
+                                            "mode": "raw",
+                                            "raw": "{\r\n    \"email\":  \"patient@example.invalid\",\r\n    \"password\":  \"replace-with-patient-password\"\r\n}",
+                                            "options": {
+                                                "raw": {
+                                                    "language": "json"
+                                                }
+                                            }
+                                        },
+                                        "url": "{{base_url}}/api/patient/auth/login",
+                                        "description": "Authenticates a Patient and stores a successful response token in the patient_token collection variable."
+                                    }
+                                },
+                                {
+                                    "name": "Invalid Credentials - Patient Login",
+                                    "request": {
+                                        "method": "POST",
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "key": "Content-Type",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "body": {
+                                            "mode": "raw",
+                                            "raw": "{\r\n    \"email\":  \"patient@example.invalid\",\r\n    \"password\":  \"invalid-password\"\r\n}",
+                                            "options": {
+                                                "raw": {
+                                                    "language": "json"
+                                                }
+                                            }
+                                        },
+                                        "url": "{{base_url}}/api/patient/auth/login",
+                                        "description": "Expected response: HTTP 401 with error_code INVALID_CREDENTIALS."
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Logout",
+                            "item": [
+                                {
+                                    "name": "Patient Logout",
+                                    "request": {
+                                        "method": "POST",
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "auth": {
+                                            "type": "bearer",
+                                            "bearer": [
+                                                {
+                                                    "key": "token",
+                                                    "value": "{{patient_token}}",
+                                                    "type": "string"
+                                                }
+                                            ]
+                                        },
+                                        "url": "{{base_url}}/api/patient/auth/logout",
+                                        "description": "Revokes only the Patient token used for this request."
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Change Password",
+                            "item": [
+                                {
+                                    "name": "Patient Change Password",
+                                    "request": {
+                                        "method": "PATCH",
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "key": "Content-Type",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "auth": {
+                                            "type": "bearer",
+                                            "bearer": [
+                                                {
+                                                    "key": "token",
+                                                    "value": "{{patient_token}}",
+                                                    "type": "string"
+                                                }
+                                            ]
+                                        },
+                                        "body": {
+                                            "mode": "raw",
+                                            "raw": "{\r\n    \"password_confirmation\":  \"replace-with-new-password\",\r\n    \"password\":  \"replace-with-new-password\",\r\n    \"current_password\":  \"replace-with-current-password\"\r\n}",
+                                            "options": {
+                                                "raw": {
+                                                    "language": "json"
+                                                }
+                                            }
+                                        },
+                                        "url": "{{base_url}}/api/patient/auth/password"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Departments",
+                    "item": [
+                        {
+                            "name": "List Departments",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{patient_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "url": "{{base_url}}/api/patient/departments",
+                                "description": "Returns the complete approved Department collection."
+                            }
+                        },
+                        {
+                            "name": "Show Department",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{patient_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "url": "{{base_url}}/api/patient/departments/1",
+                                "description": "Replace the example identifier with an existing Department identifier."
+                            }
+                        },
+                        {
+                            "name": "Unauthenticated - List Departments",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": "{{base_url}}/api/patient/departments",
+                                "description": "Expected response: HTTP 401 with error_code UNAUTHENTICATED."
+                            }
+                        },
+                        {
+                            "name": "Forbidden - Doctor Token Lists Departments",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{doctor_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "url": "{{base_url}}/api/patient/departments",
+                                "description": "Expected response: HTTP 403 with error_code FORBIDDEN."
+                            }
+                        },
+                        {
+                            "name": "Resource Not Found - Department",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{patient_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "url": "{{base_url}}/api/patient/departments/999999",
+                                "description": "Expected response: HTTP 404 with error_code RESOURCE_NOT_FOUND."
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Medical Services",
+                    "item": [
+                        {
+                            "name": "List Medical Services",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{patient_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "url": "{{base_url}}/api/patient/medical-services",
+                                "description": "Returns the complete approved Medical Service collection."
+                            }
+                        },
+                        {
+                            "name": "Show Medical Service",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{patient_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "url": "{{base_url}}/api/patient/medical-services/1",
+                                "description": "Replace the example identifier with an existing Medical Service identifier."
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Doctors",
+                    "item": [
+                        {
+                            "name": "List Doctors",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{patient_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "url": "{{base_url}}/api/patient/doctors",
+                                "description": "Returns the complete approved Doctor collection."
+                            }
+                        },
+                        {
+                            "name": "Show Doctor",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{patient_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "url": "{{base_url}}/api/patient/doctors/1",
+                                "description": "Replace the example identifier with an existing Doctor user identifier."
+                            }
+                        },
+                        {
+                            "name": "List Doctor Working Hours",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{patient_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "url": "{{base_url}}/api/patient/doctors/1/working-hours",
+                                "description": "Returns recurring working periods for the selected Doctor."
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Doctor",
+            "item": [
+                {
+                    "name": "Authentication",
+                    "item": [
+                        {
+                            "name": "Login",
+                            "item": [
+                                {
+                                    "name": "Doctor Login",
+                                    "event": [
+                                        {
+                                            "listen": "test",
+                                            "script": {
+                                                "type": "text/javascript",
+                                                "exec": [
+                                                    "const payload = pm.response.json();",
+                                                    "if (payload.success && payload.data && payload.data.token) {",
+                                                    "    pm.collectionVariables.set('doctor_token', payload.data.token);",
+                                                    "}"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "request": {
+                                        "method": "POST",
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "key": "Content-Type",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "body": {
+                                            "mode": "raw",
+                                            "raw": "{\r\n    \"email\":  \"doctor@example.invalid\",\r\n    \"password\":  \"replace-with-doctor-password\"\r\n}",
+                                            "options": {
+                                                "raw": {
+                                                    "language": "json"
+                                                }
+                                            }
+                                        },
+                                        "url": "{{base_url}}/api/doctor/auth/login",
+                                        "description": "Authenticates a Doctor and stores a successful response token in the doctor_token collection variable."
+                                    }
+                                },
+                                {
+                                    "name": "Role Mismatch - Patient Account on Doctor Login",
+                                    "request": {
+                                        "method": "POST",
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "key": "Content-Type",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "body": {
+                                            "mode": "raw",
+                                            "raw": "{\r\n    \"email\":  \"patient@example.invalid\",\r\n    \"password\":  \"replace-with-patient-password\"\r\n}",
+                                            "options": {
+                                                "raw": {
+                                                    "language": "json"
+                                                }
+                                            }
+                                        },
+                                        "url": "{{base_url}}/api/doctor/auth/login",
+                                        "description": "Expected response: HTTP 403 with error_code ROLE_MISMATCH."
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Logout",
+                            "item": [
+                                {
+                                    "name": "Doctor Logout",
+                                    "request": {
+                                        "method": "POST",
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "auth": {
+                                            "type": "bearer",
+                                            "bearer": [
+                                                {
+                                                    "key": "token",
+                                                    "value": "{{doctor_token}}",
+                                                    "type": "string"
+                                                }
+                                            ]
+                                        },
+                                        "url": "{{base_url}}/api/doctor/auth/logout",
+                                        "description": "Revokes only the Doctor token used for this request."
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Change Password",
+                            "item": [
+                                {
+                                    "name": "Doctor Change Password",
+                                    "request": {
+                                        "method": "PATCH",
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "key": "Content-Type",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "auth": {
+                                            "type": "bearer",
+                                            "bearer": [
+                                                {
+                                                    "key": "token",
+                                                    "value": "{{doctor_token}}",
+                                                    "type": "string"
+                                                }
+                                            ]
+                                        },
+                                        "body": {
+                                            "mode": "raw",
+                                            "raw": "{\r\n    \"password_confirmation\":  \"replace-with-new-password\",\r\n    \"password\":  \"replace-with-new-password\",\r\n    \"current_password\":  \"replace-with-current-password\"\r\n}",
+                                            "options": {
+                                                "raw": {
+                                                    "language": "json"
+                                                }
+                                            }
+                                        },
+                                        "url": "{{base_url}}/api/doctor/auth/password"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Secretary",
+            "item": [
+                {
+                    "name": "Authentication",
+                    "item": [
+                        {
+                            "name": "Login",
+                            "item": [
+                                {
+                                    "name": "Secretary Login",
+                                    "event": [
+                                        {
+                                            "listen": "test",
+                                            "script": {
+                                                "type": "text/javascript",
+                                                "exec": [
+                                                    "const payload = pm.response.json();",
+                                                    "if (payload.success && payload.data && payload.data.token) {",
+                                                    "    pm.collectionVariables.set('secretary_token', payload.data.token);",
+                                                    "}"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "request": {
+                                        "method": "POST",
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "key": "Content-Type",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "body": {
+                                            "mode": "raw",
+                                            "raw": "{\r\n    \"email\":  \"secretary@example.invalid\",\r\n    \"password\":  \"replace-with-secretary-password\"\r\n}",
+                                            "options": {
+                                                "raw": {
+                                                    "language": "json"
+                                                }
+                                            }
+                                        },
+                                        "url": "{{base_url}}/api/secretary/auth/login",
+                                        "description": "Authenticates a Secretary and stores a successful response token in the secretary_token collection variable."
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Logout",
+                            "item": [
+                                {
+                                    "name": "Secretary Logout",
+                                    "request": {
+                                        "method": "POST",
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "auth": {
+                                            "type": "bearer",
+                                            "bearer": [
+                                                {
+                                                    "key": "token",
+                                                    "value": "{{secretary_token}}",
+                                                    "type": "string"
+                                                }
+                                            ]
+                                        },
+                                        "url": "{{base_url}}/api/secretary/auth/logout",
+                                        "description": "Revokes only the Secretary token used for this request."
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Change Password",
+                            "item": [
+                                {
+                                    "name": "Secretary Change Password",
+                                    "request": {
+                                        "method": "PATCH",
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "key": "Content-Type",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "auth": {
+                                            "type": "bearer",
+                                            "bearer": [
+                                                {
+                                                    "key": "token",
+                                                    "value": "{{secretary_token}}",
+                                                    "type": "string"
+                                                }
+                                            ]
+                                        },
+                                        "body": {
+                                            "mode": "raw",
+                                            "raw": "{\r\n    \"password_confirmation\":  \"replace-with-new-password\",\r\n    \"password\":  \"replace-with-new-password\",\r\n    \"current_password\":  \"replace-with-current-password\"\r\n}",
+                                            "options": {
+                                                "raw": {
+                                                    "language": "json"
+                                                }
+                                            }
+                                        },
+                                        "url": "{{base_url}}/api/secretary/auth/password"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Super Administrator",
+            "item": [
+                {
+                    "name": "Authentication",
+                    "item": [
+                        {
+                            "name": "Login",
+                            "item": [
+                                {
+                                    "name": "Super Administrator Login",
+                                    "event": [
+                                        {
+                                            "listen": "test",
+                                            "script": {
+                                                "type": "text/javascript",
+                                                "exec": [
+                                                    "const payload = pm.response.json();",
+                                                    "if (payload.success && payload.data && payload.data.token) {",
+                                                    "    pm.collectionVariables.set('super_administrator_token', payload.data.token);",
+                                                    "}"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "request": {
+                                        "method": "POST",
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "key": "Content-Type",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "body": {
+                                            "mode": "raw",
+                                            "raw": "{\r\n    \"email\":  \"super-administrator@example.invalid\",\r\n    \"password\":  \"replace-with-super-administrator-password\"\r\n}",
+                                            "options": {
+                                                "raw": {
+                                                    "language": "json"
+                                                }
+                                            }
+                                        },
+                                        "url": "{{base_url}}/api/super-administrator/auth/login",
+                                        "description": "Authenticates a Super Administrator and stores a successful response token in the super_administrator_token collection variable."
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Logout",
+                            "item": [
+                                {
+                                    "name": "Super Administrator Logout",
+                                    "request": {
+                                        "method": "POST",
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "auth": {
+                                            "type": "bearer",
+                                            "bearer": [
+                                                {
+                                                    "key": "token",
+                                                    "value": "{{super_administrator_token}}",
+                                                    "type": "string"
+                                                }
+                                            ]
+                                        },
+                                        "url": "{{base_url}}/api/super-administrator/auth/logout",
+                                        "description": "Revokes only the Super Administrator token used for this request."
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Change Password",
+                            "item": [
+                                {
+                                    "name": "Super Administrator Change Password",
+                                    "request": {
+                                        "method": "PATCH",
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "key": "Content-Type",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "auth": {
+                                            "type": "bearer",
+                                            "bearer": [
+                                                {
+                                                    "key": "token",
+                                                    "value": "{{super_administrator_token}}",
+                                                    "type": "string"
+                                                }
+                                            ]
+                                        },
+                                        "body": {
+                                            "mode": "raw",
+                                            "raw": "{\r\n    \"password_confirmation\":  \"replace-with-new-password\",\r\n    \"password\":  \"replace-with-new-password\",\r\n    \"current_password\":  \"replace-with-current-password\"\r\n}",
+                                            "options": {
+                                                "raw": {
+                                                    "language": "json"
+                                                }
+                                            }
+                                        },
+                                        "url": "{{base_url}}/api/super-administrator/auth/password"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Doctor Accounts",
+                    "item": [
+                        {
+                            "name": "Create Doctor Account",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{super_administrator_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\r\n    \"password_confirmation\":  \"replace-with-new-doctor-password\",\r\n    \"name\":  \"Fictional Doctor\",\r\n    \"email\":  \"new-doctor@example.invalid\",\r\n    \"password\":  \"replace-with-new-doctor-password\"\r\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": "{{base_url}}/api/super-administrator/doctors"
+                            }
+                        },
+                        {
+                            "name": "Edit Doctor Account",
+                            "request": {
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{super_administrator_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\r\n    \"name\":  \"Updated Fictional Doctor\"\r\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": "{{base_url}}/api/super-administrator/doctors/1",
+                                "description": "Replace the example identifier with an existing Doctor user identifier."
+                            }
+                        },
+                        {
+                            "name": "Validation Error - Create Doctor Account",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{super_administrator_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\r\n    \"password_confirmation\":  \"mismatch-two\",\r\n    \"name\":  \"\",\r\n    \"email\":  \"not-an-email\",\r\n    \"password\":  \"mismatch-one\"\r\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": "{{base_url}}/api/super-administrator/doctors",
+                                "description": "Expected response: HTTP 422 with error_code VALIDATION_ERROR."
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Secretary Accounts",
+                    "item": [
+                        {
+                            "name": "Create Secretary Account",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{super_administrator_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\r\n    \"password_confirmation\":  \"replace-with-new-secretary-password\",\r\n    \"name\":  \"Fictional Secretary\",\r\n    \"email\":  \"new-secretary@example.invalid\",\r\n    \"password\":  \"replace-with-new-secretary-password\"\r\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": "{{base_url}}/api/super-administrator/secretaries"
+                            }
+                        },
+                        {
+                            "name": "Edit Secretary Account",
+                            "request": {
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{super_administrator_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\r\n    \"name\":  \"Updated Fictional Secretary\"\r\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": "{{base_url}}/api/super-administrator/secretaries/1",
+                                "description": "Replace the example identifier with an existing Secretary user identifier."
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://127.0.0.1:8000",
+            "type": "string"
+        },
+        {
+            "key": "patient_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "doctor_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "secretary_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "super_administrator_token",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}

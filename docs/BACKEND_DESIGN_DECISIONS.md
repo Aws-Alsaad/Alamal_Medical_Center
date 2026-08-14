@@ -57,12 +57,15 @@ Each future decision should include:
 
 ### TAD-001 — Initial Technology Baseline
 
-**Status:** Adopted  
-**Date:** 2026-08-04
+**Status:** Amended and Adopted
+
+**Original Date:** 2026-08-04
+
+**Amended Date:** 2026-08-09
 
 #### Context
 
-The approved first-version Backend scope requires a stable Laravel, PHP, MySQL, and Composer baseline before implementation begins.
+The approved first-version Backend scope requires a stable Laravel, PHP, MariaDB, and Composer baseline before implementation begins.
 
 #### Decision
 
@@ -70,13 +73,13 @@ The initial Backend implementation will use:
 
 * Laravel `13.x`.
 * PHP `8.4.x`.
-* MySQL `8.4 LTS`.
+* MariaDB `10.4.32`.
 * Composer `2.x`.
 
 Local development will initially use:
 
 * A local Windows development environment.
-* A locally running MySQL database.
+* A locally running MariaDB `10.4.32` database provided through XAMPP.
 * Laravel's local development server through `php artisan serve`.
 
 Docker is not required for the first working version.
@@ -182,9 +185,9 @@ Each topic may contain its own:
 * Services.
 * Repository contracts.
 * Eloquent Repository implementations.
-* Models when the model belongs only to that topic.
+* Role-specific HTTP, Service, and Repository components when the topic requires them.
 
-Cross-role models and infrastructure must be placed under `app/Shared`.
+The approved first-version Eloquent Models are centralized under `app/Models` so persistence entities are explicit and easy to locate. Shared non-model infrastructure remains under `app/Shared`.
 
 #### Rationale
 
@@ -194,7 +197,7 @@ This organization keeps all files for one role-specific topic close together and
 
 * The previous general `Core + Modules` proposal is superseded.
 * Role-specific controllers and services must not be placed in large global folders.
-* Shared models must not be duplicated in individual role modules.
+* Eloquent Models must not be duplicated in individual role modules.
 
 #### Related Requirements and Documentation
 
@@ -215,9 +218,11 @@ The project requires one consistent execution flow for implemented HTTP requests
 
 The standard execution flow is:
 
-`Route → Form Request → Controller → Service or Services → Repository or Repositories → Eloquent Model → Database → API Resource → JSON Response`
+`Route → Form Request → Controller → Service or Services → Repository or Repositories → Eloquent Model → Database → API Resource → ApiResponse → JSON Response`
 
 The flow must be applied consistently throughout the implemented scope.
+
+`ApiResponse` is the centralized final HTTP/JSON response-envelope layer. It wraps the representation produced by the API Resource without changing the responsibility of any preceding layer.
 
 #### Rationale
 
@@ -230,7 +235,7 @@ A consistent flow provides predictable responsibilities, improves testability, a
 * Database access belongs in Repositories.
 * Input validation belongs in Form Requests.
 * Output transformation belongs in API Resources.
-* JSON-response formatting must remain centralized.
+* Final HTTP/JSON response-envelope formatting belongs in `ApiResponse` and must remain centralized.
 
 #### Related Requirements and Documentation
 
@@ -344,7 +349,7 @@ Interfaces provide explicit contracts, improve dependency inversion, and allow i
 
 #### Context
 
-Some models and technical components are used by more than one role and must not be duplicated inside individual role modules.
+Some technical components are used by more than one role and must not be duplicated inside individual role modules. The first-version Eloquent Models are centralized separately under `app/Models`.
 
 #### Decision
 
@@ -355,29 +360,23 @@ Shared components will be placed under:
 The initial shared areas are:
 
 * `Identity`
-* `Directory`
 * `Audit`
 * `Support`
 
 Examples of shared components include:
 
-* `User`
 * `UserRole`
-* `Department`
-* `MedicalService`
-* `DoctorWorkingHour`
-* `AuditLog`
 * Repository contracts and implementations used across roles.
 * Standard API-response support.
-* Shared exception and pagination support.
+* Shared authentication and exception support.
 
 #### Rationale
 
-A shared boundary avoids duplicate models and infrastructure while keeping role-specific use cases inside role modules.
+A shared boundary avoids duplicate infrastructure while keeping role-specific use cases inside role modules and persistence entities in one visible model directory.
 
 #### Consequences
 
-* A shared model must have one authoritative class.
+* Each Eloquent Model has one authoritative class under `app/Models`.
 * Role modules may depend on shared components.
 * Shared components must not contain role-specific use cases.
 * General Business Logic must not be moved into `Shared` merely to avoid choosing a module.
@@ -493,13 +492,13 @@ The SRS requires logging of login attempts, data updates, administrative changes
 
 #### Decision
 
-Audit persistence will be a shared cross-cutting component under:
+Audit repository infrastructure will be a shared cross-cutting component under:
 
 `app/Shared/Audit`
 
-The initial Audit area will contain:
+The initial Audit implementation contains:
 
-* The `AuditLog` Eloquent Model.
+* The `AuditLog` Eloquent Model under `app/Models/AuditLog.php`.
 * `AuditLogRepositoryInterface`.
 * `EloquentAuditLogRepository`.
 
@@ -542,7 +541,7 @@ Direct use of the Audit Repository by task Services preserves the agreed executi
 
 #### Context
 
-The application uses custom namespaces under `app/Modules` and `app/Shared`, while standard Artisan generators normally use Laravel's default locations when only a simple class name is supplied.
+The application uses explicit namespaces under `app/Models`, `app/Modules`, and `app/Shared`, while standard Artisan generators normally use Laravel's default locations when only a simple class name is supplied.
 
 #### Decision
 
@@ -580,8 +579,11 @@ Using the existing Laravel generators where practical is faster than building pr
 
 ### TAD-012 — Coding and Implementation Conventions
 
-**Status:** Adopted  
-**Date:** 2026-08-04
+**Status:** Amended and Adopted
+
+**Original Date:** 2026-08-04
+
+**Amended Date:** 2026-08-14
 
 #### Context
 
@@ -593,7 +595,7 @@ The initial implementation will follow:
 
 * English class, method, variable, database, route, and technical names.
 * Laravel naming conventions.
-* PSR-12 formatting.
+* PSR-12 remains the general formatting reference except where explicitly superseded by the approved project-specific Laravel Pint rules recorded in this decision.
 * Laravel Pint for automated formatting.
 * Type declarations and return types where applicable.
 * Form Requests for request validation.
@@ -602,6 +604,16 @@ The initial implementation will follow:
 * Constructor dependency injection.
 * Small focused classes.
 * Composition in preference to inheritance unless a genuine inheritance relationship exists.
+
+The consolidated Phase 6 implementation adds these code-writing conventions:
+
+* Controllers and Services use explicit operation names such as `login()`, `getDepartments()`, and `createDoctor()`; current endpoints do not use `__invoke()` or generic `execute()` methods.
+* Constructor dependencies use explicitly declared private properties and assignments rather than property promotion or decorative `readonly` declarations.
+* Repositories prefer direct readable Eloquent expressions and existing Eloquent relationships; `query()` is used only when it adds value.
+* Function and method opening braces stay on the declaration line. Control-structure continuations such as `else` begin on the next line.
+* Names are descriptive, comments explain only non-obvious reasons, and redundant DocBlocks are avoided when native types and names are sufficient.
+* Form Requests retain validation, API Resources retain output control, and centralized `ApiResponse` and error handling retain the API contract.
+* New abstraction layers are not introduced without a demonstrated requirement.
 
 Traits and abstract classes may be used only when they provide clear reusable behavior and do not hide application flow.
 
@@ -614,8 +626,10 @@ These conventions support readability, consistency, testing, and later maintenan
 #### Consequences
 
 * Formatting must be checked through Laravel Pint.
+* The repository `pint.json` preserves the approved brace and continuation style.
 * Controllers, Services, and Repositories must preserve their assigned responsibilities.
 * Unnecessary packages and abstractions must be avoided.
+* General Laravel scaffold is removed only after repository and framework references prove it unused; framework-required files are retained.
 
 #### Related Requirements and Documentation
 
@@ -721,7 +735,7 @@ The immediate database schema requires consistent keys, indexes, constraints, ti
 
 The database will use:
 
-* MySQL `8.4 LTS`.
+* MariaDB `10.4.32`.
 * Unsigned big-integer primary keys.
 * Laravel timestamps where both creation and modification are required.
 * Foreign-key constraints for confirmed relationships.
@@ -843,62 +857,37 @@ One response contract simplifies client integration, validation handling, testin
 
 ---
 
-### TAD-016 — Pagination Convention
+### TAD-016 — Complete Collection Convention
 
-**Status:** Adopted  
-**Date:** 2026-08-04
+**Status:** Amended and Adopted
+
+**Original Date:** 2026-08-04
+
+**Amended Date:** 2026-08-14
 
 #### Context
 
-Directory collections may grow and must not be returned as unlimited result sets.
+The approved first-version Patient directory contains limited Department, Medical Service, and Doctor collection endpoints. Pagination was removed as an explicitly approved Phase 6 API simplification.
 
 #### Decision
 
-Page-based pagination will be used for collections that may grow.
-
-The accepted query parameters are:
-
-* `page`
-* `per_page`
-
-The default page size is:
-
-`15`
-
-The maximum permitted page size is:
-
-`100`
-
-A paginated response includes:
-
-```json
-{
-  "meta": {
-    "current_page": 1,
-    "per_page": 15,
-    "last_page": 1,
-    "total": 0
-  }
-}
-```
-
-Pagination will initially be applied to:
+The current list endpoints return their complete approved result sets in one response:
 
 * Department lists.
 * Medical-service lists.
 * Doctor lists.
 
-It may later be applied to other growing collections when those capabilities are implemented.
+These endpoints do not accept `page` or `per_page` and do not return pagination links or metadata. No replacement pagination mechanism is introduced.
 
 #### Rationale
 
-Pagination limits memory, query, and network cost while giving React and Flutter enough metadata to request later result pages.
+This keeps the first-version API and client integration simple while preserving the exact approved route and field scope.
 
 #### Consequences
 
-* Clients request later pages explicitly.
-* `per_page` values above `100` must be rejected through validation.
-* Search, filtering, sorting, and cursor pagination are not introduced by this decision.
+* Repositories return Eloquent collections for the current list operations.
+* Tests verify that all expected records are returned.
+* Postman and current API documentation contain no collection page parameters or metadata.
 
 #### Related Requirements and Documentation
 
@@ -1056,7 +1045,7 @@ The implementation must test:
 * Super Administrator Doctor-account creation and editing.
 * Super Administrator Secretary-account creation and editing.
 * Patient read-only directory access.
-* Pagination.
+* Complete collection responses.
 * Validation behavior.
 * Standard JSON success and error formats.
 * Required audit-log generation.
@@ -1101,7 +1090,7 @@ The initial development environment will use:
 
 * Windows.
 * Local PHP and Composer.
-* Local MySQL.
+* Local MariaDB `10.4.32` provided through XAMPP.
 * `php artisan serve`.
 
 Docker is not required for the first working version.
@@ -1190,44 +1179,10 @@ A Public repository allows teammates to clone and inspect the project immediatel
 
 ## Current Status
 
-Phase 4 — Determine the First-Version Implementation Plan is complete and approved.
+Phases 0 through 5 are complete.
 
-Phase 5 — Define Technical and Architecture Decisions is complete and approved.
+Phase 6 implementation of the approved first working Backend version is complete, including the consolidated Phase 6 coding-style and architecture refactor.
 
-The adopted technical baseline now defines:
+The current implementation contains the approved `23` API routes. Pagination has been superseded by complete collection responses, and MariaDB is the currently approved implementation database platform.
 
-* Laravel, PHP, MySQL, and Composer versions.
-* The modular-monolith architecture.
-* Role-first and feature-first application organization.
-* The standard request-execution flow.
-* Services as the unified task layer.
-* Repository Interfaces and Eloquent implementations.
-* Shared-component boundaries.
-* Role-specific route organization.
-* Sanctum Bearer Token authentication.
-* Role-based authorization.
-* Audit integration.
-* Artisan generation conventions.
-* Coding conventions.
-* The minimum first-version database schema.
-* Database-integrity conventions.
-* REST and JSON conventions.
-* Pagination.
-* Validation and error conventions.
-* Initial Super Administrator provisioning.
-* Testing strategy.
-* Local-development and deployment boundaries.
-* Git and GitHub repository policy.
-
-The detailed decisions are documented in:
-
-* `LARAVEL_ARCHITECTURE.md`
-* `DATABASE_DESIGN.md`
-* `API_SPECIFICATION.md`
-* `TESTING.md`
-* `DEPLOYMENT.md`
-* `GIT_GITHUB_GUIDE.md`
-
-No Backend application implementation has started.
-
-The next stage is Phase 6 — Implement the Backend through bounded, documented, and reviewed Codex tasks.
+Deferred functionality remains deferred. The Backend is awaiting final repository commit and push closeout before moving to the next implementation phase.

@@ -34,7 +34,7 @@ Fields or tables not required by the immediate scope must not be added by assump
 
 The initial implementation uses:
 
-* MySQL `8.4 LTS`.
+* MariaDB `10.4.32`.
 * Laravel Migrations.
 * Eloquent Models.
 * Repository Interfaces.
@@ -119,7 +119,7 @@ The immediate implementation does not define:
 ### Model Placement
 
 ```text
-app/Shared/Identity/Models/User.php
+app/Models/User.php
 ```
 
 ## Table: `departments`
@@ -154,7 +154,7 @@ The complete department-detail field set remains unresolved.
 ### Model Placement
 
 ```text
-app/Shared/Directory/Models/Department.php
+app/Models/Department.php
 ```
 
 ## Table: `medical_services`
@@ -197,7 +197,7 @@ The table does not define:
 ### Model Placement
 
 ```text
-app/Shared/Directory/Models/MedicalService.php
+app/Models/MedicalService.php
 ```
 
 ## Table: `doctor_working_hours`
@@ -266,7 +266,7 @@ This table does not define:
 ### Model Placement
 
 ```text
-app/Shared/Directory/Models/DoctorWorkingHour.php
+app/Models/DoctorWorkingHour.php
 ```
 
 ## Table: `audit_logs`
@@ -335,7 +335,7 @@ No additional Audit Service is introduced initially.
 ### Model Placement
 
 ```text
-app/Shared/Audit/Models/AuditLog.php
+app/Models/AuditLog.php
 ```
 
 ## Table: `personal_access_tokens`

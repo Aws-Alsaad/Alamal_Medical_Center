@@ -57,10 +57,14 @@ Database
   ↓
 API Resource
   ↓
+ApiResponse
+  ↓
 JSON Response
 ```
 
 This flow must be used consistently throughout the implemented scope.
+
+`ApiResponse` is the centralized final HTTP/JSON response-envelope layer. It wraps the API Resource representation without changing the responsibility of any preceding layer.
 
 ## Application Organization Principle
 
@@ -96,6 +100,13 @@ Examples of features or topics include:
 
 ```text
 app/
+├── Models/
+│   ├── User.php
+│   ├── Department.php
+│   ├── MedicalService.php
+│   ├── DoctorWorkingHour.php
+│   └── AuditLog.php
+│
 ├── Modules/
 │   ├── Patient/
 │   │   ├── Authentication/
@@ -107,7 +118,6 @@ app/
 │   │   │   ├── Repositories/
 │   │   │   │   ├── Contracts/
 │   │   │   │   └── Eloquent/
-│   │   │   └── Models/
 │   │   │
 │   │   ├── Departments/
 │   │   │   ├── Http/
@@ -118,7 +128,6 @@ app/
 │   │   │   ├── Repositories/
 │   │   │   │   ├── Contracts/
 │   │   │   │   └── Eloquent/
-│   │   │   └── Models/
 │   │   │
 │   │   ├── MedicalServices/
 │   │   │   ├── Http/
@@ -129,7 +138,6 @@ app/
 │   │   │   ├── Repositories/
 │   │   │   │   ├── Contracts/
 │   │   │   │   └── Eloquent/
-│   │   │   └── Models/
 │   │   │
 │   │   ├── Doctors/
 │   │   │   ├── Http/
@@ -140,7 +148,6 @@ app/
 │   │   │   ├── Repositories/
 │   │   │   │   ├── Contracts/
 │   │   │   │   └── Eloquent/
-│   │   │   └── Models/
 │   │   │
 │   │   └── routes/
 │   │       └── api.php
@@ -155,7 +162,6 @@ app/
 │   │   │   ├── Repositories/
 │   │   │   │   ├── Contracts/
 │   │   │   │   └── Eloquent/
-│   │   │   └── Models/
 │   │   └── routes/
 │   │       └── api.php
 │   │
@@ -169,7 +175,6 @@ app/
 │   │   │   ├── Repositories/
 │   │   │   │   ├── Contracts/
 │   │   │   │   └── Eloquent/
-│   │   │   └── Models/
 │   │   └── routes/
 │   │       └── api.php
 │   │
@@ -183,7 +188,6 @@ app/
 │       │   ├── Repositories/
 │       │   │   ├── Contracts/
 │       │   │   └── Eloquent/
-│       │   └── Models/
 │       │
 │       ├── DoctorAccounts/
 │       │   ├── Http/
@@ -194,7 +198,6 @@ app/
 │       │   ├── Repositories/
 │       │   │   ├── Contracts/
 │       │   │   └── Eloquent/
-│       │   └── Models/
 │       │
 │       ├── SecretaryAccounts/
 │       │   ├── Http/
@@ -205,30 +208,19 @@ app/
 │       │   ├── Repositories/
 │       │   │   ├── Contracts/
 │       │   │   └── Eloquent/
-│       │   └── Models/
 │       │
 │       └── routes/
 │           └── api.php
 │
 ├── Shared/
 │   ├── Identity/
-│   │   ├── Models/
-│   │   │   └── User.php
 │   │   ├── Enums/
 │   │   │   └── UserRole.php
 │   │   └── Repositories/
 │   │       ├── Contracts/
 │   │       └── Eloquent/
 │   │
-│   ├── Directory/
-│   │   └── Models/
-│   │       ├── Department.php
-│   │       ├── MedicalService.php
-│   │       └── DoctorWorkingHour.php
-│   │
 │   ├── Audit/
-│   │   ├── Models/
-│   │   │   └── AuditLog.php
 │   │   └── Repositories/
 │   │       ├── Contracts/
 │   │       │   └── AuditLogRepositoryInterface.php
@@ -236,10 +228,8 @@ app/
 │   │           └── EloquentAuditLogRepository.php
 │   │
 │   └── Support/
-│       ├── Http/
-│       │   └── ApiResponse.php
-│       ├── Exceptions/
-│       └── Pagination/
+│       └── Http/
+│           └── ApiResponse.php
 │
 └── Providers/
     ├── ModuleRouteServiceProvider.php
@@ -261,10 +251,9 @@ Feature/
 │   ├── Requests/
 │   └── Resources/
 ├── Services/
-├── Repositories/
-│   ├── Contracts/
-│   └── Eloquent/
-└── Models/
+└── Repositories/
+    ├── Contracts/
+    └── Eloquent/
 ```
 
 Not every feature must contain every directory.
@@ -272,8 +261,7 @@ Not every feature must contain every directory.
 Rules:
 
 * Do not create empty directories only to reproduce the complete template.
-* A feature uses a local Model only when the Model belongs exclusively to that feature.
-* Cross-role Models belong under `app/Shared`.
+* Current Eloquent Models belong under `app/Models` and are not duplicated inside features.
 * A feature may use shared Repositories when the persistence concept is shared.
 * Role-specific Services remain inside the role feature.
 
@@ -394,7 +382,7 @@ Eloquent Models define:
 
 Models must not become replacements for Services.
 
-Cross-role Models belong under `app/Shared`.
+The current persistence entities belong under `app/Models`. Models expose only appropriate Eloquent concerns such as fillable or hidden attributes, casts, confirmed relationships, and model-specific behavior.
 
 ### API Resources
 
@@ -405,7 +393,6 @@ API Resources define:
 * Exposed response fields.
 * Nested response structures.
 * Relationship representation.
-* Pagination-resource representation when applicable.
 
 API Resources must prevent accidental exposure of sensitive fields.
 
@@ -416,7 +403,6 @@ API Resources must prevent accidental exposure of sensitive fields.
 Initial shared areas are:
 
 * `Identity`
-* `Directory`
 * `Audit`
 * `Support`
 
@@ -490,7 +476,7 @@ Protected routes require Sanctum authentication and role authorization.
 
 ## Audit Placement
 
-Audit persistence belongs under:
+Audit repository infrastructure belongs under:
 
 ```text
 app/Shared/Audit
@@ -499,7 +485,7 @@ app/Shared/Audit
 The initial components are:
 
 ```text
-AuditLog
+app/Models/AuditLog.php
 AuditLogRepositoryInterface
 EloquentAuditLogRepository
 ```
@@ -548,7 +534,7 @@ Standard Artisan generators may be used with a fully qualified application class
 Examples:
 
 ```bash
-php artisan make:controller App/Modules/Patient/Doctors/Http/Controllers/ShowDoctorController --invokable
+php artisan make:controller App/Modules/Patient/Doctors/Http/Controllers/ShowDoctorController
 ```
 
 ```bash
@@ -579,7 +565,7 @@ The implementation will use:
 
 * English technical naming.
 * Laravel naming conventions.
-* PSR-12 formatting.
+* PSR-12 remains the general formatting reference except where explicitly superseded by the approved project-specific Laravel Pint rules documented for this project.
 * Laravel Pint.
 * Type declarations and return types where applicable.
 * Constructor dependency injection.
@@ -590,6 +576,23 @@ The implementation will use:
 * Eloquent Repository implementations.
 * API Resources.
 * Composition in preference to unnecessary inheritance.
+
+The following consolidated conventions apply to current and later project phases:
+
+* Controllers remain thin and call Services for application operations. Current route actions use explicit method names and do not use invokable controllers.
+* Each Service method names its use case explicitly; generic `execute()` methods are not used for current operations.
+* Services depend on Repository contracts, and Eloquent Repository implementations perform persistence through `app/Models`.
+* Direct readable Eloquent expressions such as `User::where(...)`, `Department::all()`, `User::create(...)`, and `$user->update(...)` are preferred. `query()` remains available only where it materially helps a query.
+* Confirmed Eloquent relationships are preferred over reconstructing the same foreign-key query, including the Doctor `workingHours` relationship.
+* Constructor dependencies use explicitly declared private properties and constructor assignments. Property promotion and decorative `readonly` declarations are not used by the current application classes.
+* Function and method opening braces are on the declaration line. A continuation such as `else` begins on the next line after the previous closing brace.
+* Public, private, and protected visibility reflect actual use; `protected` is reserved for inheritance requirements.
+* Names are descriptive and comments are limited to non-obvious implementation reasons. Redundant DocBlocks are avoided when native types and names are sufficient.
+* Form Requests own HTTP input validation, API Resources own output field selection, and centralized `ApiResponse` and exception handling own the JSON contract.
+* New Actions, DTOs, Query Objects, Specifications, CQRS layers, Service Interfaces, or similar abstractions require a demonstrated and approved need.
+* Current Department, Medical Service, and Doctor lists return complete Eloquent collections with no pagination parameters, links, or metadata.
+* Laravel scaffold is deleted only after framework configuration, Composer, routes, application code, and tests prove it unused.
+* Laravel Pint uses the repository `pint.json` so automated formatting preserves the approved brace and continuation style.
 
 Traits, abstract classes, and third-party packages must be introduced only when a clear approved technical reason exists.
 
@@ -616,10 +619,10 @@ These areas remain deferred until the related requirements, providers, policies,
 
 ## Current Status
 
-The first Laravel-architecture decisions required for Phase 5 have been reviewed and adopted.
+The documented architecture is implemented for the approved first-version Phase 6 scope.
 
-This file documents the approved organization and layer responsibilities.
+The current Models, Modules, Services, Repositories, Form Requests, API Resources, route organization, shared components, and providers follow this architecture. The consolidated coding-style rules are active.
 
-No application directories or source-code files have been created by this documentation task.
+Current list endpoints return complete collections without pagination. Deferred architecture areas remain deferred; this status does not imply that the entire SRS or Backend has been implemented.
 
-Database design, API details, testing organization, deployment constraints, and final Phase 5 completion remain to be documented before implementation begins.
+This document remains the architecture reference for subsequent Backend phases.

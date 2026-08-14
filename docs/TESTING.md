@@ -110,10 +110,15 @@ Automated tests must use an isolated test environment.
 Rules:
 
 * Use `.env.testing` or equivalent test configuration.
+* Keep the machine-specific `.env.testing` file Git-ignored.
+* Copy `.env.testing.example` to `.env.testing` and supply only local test credentials when setting up another machine.
 * Never use production credentials.
 * Never run destructive tests against a production database.
-* Use an isolated test database.
-* Prefer matching the adopted MySQL behavior where database-specific constraints are under test.
+* Use a separate MariaDB testing database rather than the development or production database.
+* Use `alamal_medical_center_testing` as the dedicated local testing database.
+* Never point the test environment at the development database `alamal_medical_center`.
+* Use MariaDB `10.4.32` as the approved database-backed test platform.
+* Laravel may use `DB_CONNECTION=mysql` for the testing database because Laravel's MySQL connection and driver are used to connect to MariaDB.
 * Reset database state between tests through Laravel database-testing facilities.
 * Keep tests deterministic.
 * Do not depend on test execution order.
@@ -272,7 +277,7 @@ Verify:
 * Patient can view a department.
 * Only `id` and `name` are returned.
 * Missing departments return `404`.
-* Lists use pagination.
+* The list returns every expected Department record in one collection response.
 
 ### Medical Services
 
@@ -283,7 +288,7 @@ Verify:
 * Only `id`, `name`, and `cost` are returned.
 * Negative cost data is rejected by the implemented integrity controls.
 * No unsupported department relationship is returned.
-* Lists use pagination.
+* The list returns every expected Medical Service record in one collection response.
 
 ### Doctors
 
@@ -295,7 +300,7 @@ Verify:
 * Only the approved minimum fields are returned.
 * Email, password, password hash, and tokens are not returned.
 * Missing Doctors return `404`.
-* Lists use pagination.
+* The list returns every expected Doctor record in one collection response.
 
 ### Doctor Working Hours
 
@@ -311,21 +316,13 @@ Verify:
   - `end_time`
 * No appointment availability is calculated.
 
-## Pagination Tests
+## Complete Collection Tests
 
 Verify:
 
-* The default page size is `15`.
-* `page=1` returns the first result page.
-* Later pages return later results.
-* `per_page=100` is accepted.
-* Values above `100` return `422`.
-* Values below `1` return `422`.
-* Pagination metadata contains:
-  - `current_page`
-  - `per_page`
-  - `last_page`
-  - `total`
+* Department, Medical Service, and Doctor list endpoints return all expected records.
+* Collection responses contain the approved fields only.
+* Collection responses contain no pagination links or metadata.
 
 ## Validation Tests
 
@@ -338,7 +335,6 @@ For every implemented Form Request, verify:
 * Maximum supported lengths.
 * Password confirmation.
 * Correct current password where required.
-* Pagination bounds.
 * Rejection of unsupported fields when required by the implementation boundary.
 * Standard validation-error JSON.
 * HTTP status `422`.
@@ -425,7 +421,7 @@ Repository-focused tests should verify:
 
 * Documented query filters.
 * Role-filtered Doctor queries.
-* Pagination queries.
+* Complete collection queries.
 * Persistence operations.
 * Unique-email conflicts.
 * Confirmed relationships.
@@ -464,6 +460,12 @@ A complete penetration test and final compliance audit remain outside the immedi
 
 ## Postman
 
+The committed Postman Collection is stored at:
+
+    postman/Alamal_Medical_Center.postman_collection.json
+
+This repository location is the adopted first-version location for the project's committed Postman Collection.
+
 After endpoint implementation, create or update one Postman Collection containing:
 
 * Role-specific login requests.
@@ -476,10 +478,20 @@ After endpoint implementation, create or update one Postman Collection containin
 * Medical-service endpoints.
 * Doctor endpoints.
 * Working-hour endpoint.
-* Pagination examples.
 * Expected error examples.
 
-Use Postman environment variables for:
+The top-level folders are organized by role:
+
+* `Patient`
+* `Doctor`
+* `Secretary`
+* `Super Administrator`
+
+Each role keeps `Login`, `Logout`, and `Change Password` inside its own `Authentication` folder. Other requests remain inside their owning role and feature folders.
+
+The collection represents all `23` implemented API routes and keeps focused error examples beside the relevant role or feature request.
+
+Use Postman collection variables for:
 
 ```text
 base_url
@@ -490,6 +502,14 @@ super_administrator_token
 ```
 
 Do not place real credentials or tokens in the committed Collection.
+
+Start the local API before using the collection:
+
+```bash
+php artisan serve
+```
+
+The default collection value is `base_url=http://127.0.0.1:8000`. If Postman remains at `Sending request`, first confirm that the Laravel server is running and that `base_url` matches its host and port.
 
 ## Commands
 

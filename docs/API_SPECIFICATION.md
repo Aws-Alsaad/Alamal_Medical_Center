@@ -12,7 +12,7 @@ It defines:
 * Minimum request fields.
 * Minimum response fields.
 * Standard success and error envelopes.
-* Pagination.
+* Complete collection responses.
 * HTTP status conventions.
 * Stable application error codes.
 * Deferred API areas.
@@ -105,46 +105,13 @@ Rules:
 * `errors` is included when field-level details exist.
 * Stack traces and sensitive implementation details are never returned.
 
-## Pagination
+## Collection Responses
 
-Collection query parameters:
+The current list endpoints return their complete approved result sets in the `data` array.
 
-```text
-page
-per_page
-```
+The API does not accept `page` or `per_page` for these collections and does not return pagination links or metadata.
 
-Rules:
-
-* Default `per_page`: `15`.
-* Minimum `per_page`: `1`.
-* Maximum `per_page`: `100`.
-* Invalid values return `422`.
-
-Example request:
-
-```http
-GET /api/patient/doctors?page=2&per_page=15
-```
-
-Example response:
-
-```json
-{
-  "success": true,
-  "status_code": 200,
-  "message": "Doctors retrieved successfully.",
-  "data": [],
-  "meta": {
-    "current_page": 2,
-    "per_page": 15,
-    "last_page": 4,
-    "total": 52
-  }
-}
-```
-
-Pagination applies initially to:
+This complete-collection convention applies to:
 
 * Department lists.
 * Medical-service lists.
@@ -422,7 +389,7 @@ id
 name
 ```
 
-The result is paginated.
+The response contains the complete Department collection.
 
 ### View Department
 
@@ -455,7 +422,7 @@ name
 cost
 ```
 
-The result is paginated.
+The response contains the complete Medical Service collection.
 
 ### View Medical Service
 
@@ -490,7 +457,7 @@ name
 
 The result contains users whose role is `doctor`.
 
-The result is paginated.
+The response contains the complete Doctor collection.
 
 ### View Doctor
 
@@ -591,21 +558,6 @@ email:
 ```
 
 At least one supported field must be supplied for an account-edit request.
-
-### Pagination
-
-```text
-page:
-- optional
-- integer
-- minimum 1
-
-per_page:
-- optional
-- integer
-- minimum 1
-- maximum 100
-```
 
 ## HTTP Status Codes
 

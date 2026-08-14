@@ -34,7 +34,7 @@ Technologies:
 
 * Laravel
 * PHP
-* MySQL
+* MariaDB 10.4.32
 
 ### Other Team Members
 
@@ -87,7 +87,7 @@ Backend:
 
 Database:
 
-* MySQL
+* MariaDB 10.4.32
 
 Communication:
 
@@ -345,11 +345,11 @@ Backend:
 
 Database:
 
-* MySQL
+* MariaDB 10.4.32
 
 Authentication:
 
-* Laravel Sanctum (preferred candidate)
+* Laravel Sanctum
 
 API Format:
 

@@ -19,9 +19,6 @@ final class ApiResponse
         ], $status);
     }
 
-    /**
-     * @param  array<string, mixed>|null  $errors
-     */
     public static function error(
         string $message,
         string $errorCode,

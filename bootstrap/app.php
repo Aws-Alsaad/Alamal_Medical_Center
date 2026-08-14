@@ -1,5 +1,8 @@
 <?php
 
+use App\Shared\Identity\Exceptions\InvalidCredentialsException;
+use App\Shared\Identity\Exceptions\RoleMismatchException;
+use App\Shared\Identity\Http\Middleware\EnsureUserHasRole;
 use App\Shared\Support\Http\ApiResponse;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
@@ -16,7 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'role' => EnsureUserHasRole::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
@@ -38,6 +43,16 @@ return Application::configure(basePath: dirname(__DIR__))
                     errorCode: 'VALIDATION_ERROR',
                     status: 422,
                     errors: $exception->errors(),
+                ),
+                $exception instanceof InvalidCredentialsException => ApiResponse::error(
+                    message: 'The provided credentials are invalid.',
+                    errorCode: 'INVALID_CREDENTIALS',
+                    status: 401,
+                ),
+                $exception instanceof RoleMismatchException => ApiResponse::error(
+                    message: 'The credentials do not match the requested role.',
+                    errorCode: 'ROLE_MISMATCH',
+                    status: 403,
                 ),
                 $exception instanceof AuthenticationException, $httpStatus === 401 => ApiResponse::error(
                     message: 'Authentication is required.',

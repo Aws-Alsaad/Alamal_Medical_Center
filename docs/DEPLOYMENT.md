@@ -13,7 +13,7 @@ This file must not invent a hosting provider, server specification, backup strat
 ```text
 Laravel 13.x
 PHP 8.4.x
-MySQL 8.4 LTS
+MariaDB 10.4.32
 Composer 2.x
 ```
 
@@ -24,7 +24,7 @@ The immediate local environment uses:
 * Windows.
 * Local PHP.
 * Composer.
-* Local MySQL.
+* MariaDB `10.4.32` provided through XAMPP.
 * Laravel's local server through `php artisan serve`.
 
 Docker is not required for the first working version.
@@ -45,7 +45,9 @@ The local server is a development tool and is not the production server decision
 
 ## Database
 
-Local development uses a locally running MySQL database.
+Local development uses MariaDB `10.4.32` provided through XAMPP.
+
+Laravel continues to use `DB_CONNECTION=mysql` because Laravel's MySQL connection and driver are used to connect to MariaDB. The configuration value identifies the Laravel driver and does not mean that the database server is MySQL.
 
 Database credentials are provided through local environment configuration.
 
