@@ -458,6 +458,30 @@ Verify:
 
 A complete penetration test and final compliance audit remain outside the immediate testing decision.
 
+## Local Manual API / Postman Setup
+
+Prepare the local development database and start Laravel with:
+
+```bash
+php artisan migrate
+php artisan db:seed --class=DevelopmentSeeder
+php artisan serve
+```
+
+The development-only credentials are:
+
+* Patient — `patient@example.test`
+* Doctor — `doctor@example.test`
+* Secretary — `secretary@example.test`
+* Super Administrator — `superadmin@example.test`
+* Shared development password — `Password123!`
+
+These are fake credentials committed only to simplify local Postman, frontend, and mobile integration. They must never be reused as production credentials.
+
+`DevelopmentSeeder` is not called automatically by `DatabaseSeeder`; it must be selected explicitly. `InitialSuperAdministratorSeeder` remains the separate environment-driven mechanism for provisioning the real initial Super Administrator.
+
+The local Postman workflow uses Laravel's development server and does not require Apache. Its default base URL is `http://127.0.0.1:8000`.
+
 ## Postman
 
 The committed Postman Collection is stored at:
@@ -503,13 +527,7 @@ super_administrator_token
 
 Do not place real credentials or tokens in the committed Collection.
 
-Start the local API before using the collection:
-
-```bash
-php artisan serve
-```
-
-The default collection value is `base_url=http://127.0.0.1:8000`. If Postman remains at `Sending request`, first confirm that the Laravel server is running and that `base_url` matches its host and port.
+Follow the local setup above before using the collection. If Postman remains at `Sending request`, first confirm that the Laravel server is running and that `base_url` matches its host and port.
 
 ## Commands
 

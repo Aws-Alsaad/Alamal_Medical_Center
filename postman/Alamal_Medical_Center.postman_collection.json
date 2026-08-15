@@ -2,7 +2,7 @@
     "info": {
         "_postman_id": "a81eebc9-3cbb-45a5-9dc9-97adcf9f91ed",
         "name": "Alamal Medical Center - First-Version API",
-        "description": "Manual verification for the approved Phase 6 first-version backend. Start the local API with php artisan serve and use the default base_url http://127.0.0.1:8000, or override the collection variable for another local port. A Postman request that remains at Sending request usually means the local Laravel server is not running, base_url points to the wrong port, or the request is using an unavailable host. Successful login requests store fictional-session tokens in role-specific collection variables.",
+        "description": "Manual verification for the approved Phase 6 first-version backend. Run php artisan migrate, php artisan db:seed --class=DevelopmentSeeder, and php artisan serve before testing with the committed fake development credentials. The default base_url is http://127.0.0.1:8000. These credentials must never be used in production. Successful login requests store tokens in role-specific collection variables.",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "item": [
@@ -47,7 +47,7 @@
                                         ],
                                         "body": {
                                             "mode": "raw",
-                                            "raw": "{\r\n    \"email\":  \"patient@example.invalid\",\r\n    \"password\":  \"replace-with-patient-password\"\r\n}",
+                                            "raw": "{\r\n    \"email\": \"patient@example.test\",\r\n    \"password\": \"Password123!\"\r\n}",
                                             "options": {
                                                 "raw": {
                                                     "language": "json"
@@ -55,7 +55,7 @@
                                             }
                                         },
                                         "url": "{{base_url}}/api/patient/auth/login",
-                                        "description": "Authenticates a Patient and stores a successful response token in the patient_token collection variable."
+                                        "description": "Authenticates the fake DevelopmentSeeder Patient and stores the token in the patient_token collection variable. Never use these credentials in production."
                                     }
                                 },
                                 {
@@ -76,7 +76,7 @@
                                         ],
                                         "body": {
                                             "mode": "raw",
-                                            "raw": "{\r\n    \"email\":  \"patient@example.invalid\",\r\n    \"password\":  \"invalid-password\"\r\n}",
+                                            "raw": "{\r\n    \"email\": \"patient@example.test\",\r\n    \"password\": \"invalid-password\"\r\n}",
                                             "options": {
                                                 "raw": {
                                                     "language": "json"
@@ -462,7 +462,7 @@
                                         ],
                                         "body": {
                                             "mode": "raw",
-                                            "raw": "{\r\n    \"email\":  \"doctor@example.invalid\",\r\n    \"password\":  \"replace-with-doctor-password\"\r\n}",
+                                            "raw": "{\r\n    \"email\": \"doctor@example.test\",\r\n    \"password\": \"Password123!\"\r\n}",
                                             "options": {
                                                 "raw": {
                                                     "language": "json"
@@ -470,7 +470,7 @@
                                             }
                                         },
                                         "url": "{{base_url}}/api/doctor/auth/login",
-                                        "description": "Authenticates a Doctor and stores a successful response token in the doctor_token collection variable."
+                                        "description": "Authenticates the fake DevelopmentSeeder Doctor and stores the token in the doctor_token collection variable. Never use these credentials in production."
                                     }
                                 },
                                 {
@@ -491,7 +491,7 @@
                                         ],
                                         "body": {
                                             "mode": "raw",
-                                            "raw": "{\r\n    \"email\":  \"patient@example.invalid\",\r\n    \"password\":  \"replace-with-patient-password\"\r\n}",
+                                            "raw": "{\r\n    \"email\": \"patient@example.test\",\r\n    \"password\": \"Password123!\"\r\n}",
                                             "options": {
                                                 "raw": {
                                                     "language": "json"
@@ -622,7 +622,7 @@
                                         ],
                                         "body": {
                                             "mode": "raw",
-                                            "raw": "{\r\n    \"email\":  \"secretary@example.invalid\",\r\n    \"password\":  \"replace-with-secretary-password\"\r\n}",
+                                            "raw": "{\r\n    \"email\": \"secretary@example.test\",\r\n    \"password\": \"Password123!\"\r\n}",
                                             "options": {
                                                 "raw": {
                                                     "language": "json"
@@ -630,7 +630,7 @@
                                             }
                                         },
                                         "url": "{{base_url}}/api/secretary/auth/login",
-                                        "description": "Authenticates a Secretary and stores a successful response token in the secretary_token collection variable."
+                                        "description": "Authenticates the fake DevelopmentSeeder Secretary and stores the token in the secretary_token collection variable. Never use these credentials in production."
                                     }
                                 }
                             ]
@@ -753,7 +753,7 @@
                                         ],
                                         "body": {
                                             "mode": "raw",
-                                            "raw": "{\r\n    \"email\":  \"super-administrator@example.invalid\",\r\n    \"password\":  \"replace-with-super-administrator-password\"\r\n}",
+                                            "raw": "{\r\n    \"email\": \"superadmin@example.test\",\r\n    \"password\": \"Password123!\"\r\n}",
                                             "options": {
                                                 "raw": {
                                                     "language": "json"
@@ -761,7 +761,7 @@
                                             }
                                         },
                                         "url": "{{base_url}}/api/super-administrator/auth/login",
-                                        "description": "Authenticates a Super Administrator and stores a successful response token in the super_administrator_token collection variable."
+                                        "description": "Authenticates the fake DevelopmentSeeder Super Administrator and stores the token in the super_administrator_token collection variable. Never use these credentials in production."
                                     }
                                 }
                             ]
